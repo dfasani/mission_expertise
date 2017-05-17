@@ -68,46 +68,6 @@ def compute_distances_between_companies():
     conn.close()
 
 
-def update_companies_latlng():
-    logging.info("maj des coordonnées GPS des entreprises...")
-
-    # Open database connection
-    conn = sqlite3.connect('missionexpertise.db')
-
-    # prepare a cursor object using cursor() method
-    cursor = conn.cursor()
-
-    for row in cursor.execute('SELECT * FROM entreprise WHERE lat IS NULL'):
-
-        nom = row[1]
-        cp = row[2]
-        ville = row[3]
-
-        adresse = nom + ", " + cp + ", " + ville + ", France "
-
-        coordonnees = geocoder.google(adresse).latlng
-
-        print(row, coordonnees)
-
-        # le geocoding ne fonctionne pas parfois, on laisse qques chances
-        if len(coordonnees) == 0:
-            for _ in range(2):
-                if len(coordonnees) == 0:
-                    # sleep(randint(1,3))
-                    coordonnees = geocoder.google(adresse).latlng
-
-        if len(coordonnees) == 0:
-            raise ValueError("adresse introuvable", adresse)
-
-        sqlUpdate = 'UPDATE entreprise  SET lat={} , lng={} WHERE id={}'.format(coordonnees[0], coordonnees[1], row[0])
-        conn.cursor().execute(sqlUpdate)
-
-        conn.commit()
-
-    # disconnect from server
-    conn.close()
-
-    logging.info("maj des coordonnées GPS des entreprises   [OK]")
 
 
 def get_distance_matrix():
@@ -275,4 +235,4 @@ if __name__ == '__main__':
         # Now print fetched result
         print("nom=%s,cp=%s,ville=%s,demande=%s" % (nom, cp, ville, demande))
 
-    update_companies_latlng()
+
