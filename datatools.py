@@ -62,7 +62,7 @@ def compute_distances_between_companies():
                 matrix[from_node][to_node] = distance
 
                 cursor.execute("INSERT INTO distance_entreprise VALUES ('%s','%s','%s')" % (
-                correspondance_case_identreprise[from_node], correspondance_case_identreprise[to_node], distance))
+                    correspondance_case_identreprise[from_node], correspondance_case_identreprise[to_node], distance))
 
     conn.commit()
     conn.close()
@@ -133,8 +133,8 @@ def get_distance_matrix():
     # disconnect from server
     conn.close()
 
-    #pp = pprint.PrettyPrinter(indent=4)
-    #pp.pprint(matrix)
+    # pp = pprint.PrettyPrinter(indent=4)
+    # pp.pprint(matrix)
 
     return matrix
 
@@ -201,7 +201,7 @@ def list_students():
     return results
 
 
-def insert_result(distanceTotale, num_locations, num_vehicles, result_by_vehicule, correspondance_case_identreprise):
+def insert_result(distanceTotale, num_locations, num_vehicles, result_by_vehicule):
     # Open database connection
     conn = sqlite3.connect('missionexpertise.db')
 
@@ -221,11 +221,11 @@ def insert_result(distanceTotale, num_locations, num_vehicles, result_by_vehicul
 
         etapes = route.split(" -> ")
 
-        for i, etape in enumerate(etapes[1:-1]):
+        for i, etape in enumerate(etapes):
             etape = int(etape)
             cursor.execute(
                 "INSERT INTO etape(id_calcul,num_vehicule,id_entreprise,ordre) VALUES ('%s','%s','%s','%d')" % (
-                    idcalcul, vehicle_nbr, correspondance_case_identreprise[etape], i))
+                    idcalcul, vehicle_nbr, etape, i))
 
     # enregistre les changements
     conn.commit()

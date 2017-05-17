@@ -58,6 +58,10 @@ class CreateDistanceCallback(object):
         dep=correspondance_case_identreprise[from_node]
         arr=correspondance_case_identreprise[to_node]
 
+        #petit hack, le depot est toujours a une distance de 0
+        if dep == 66 or arr ==66:
+            return 0
+
         return self.matrix[dep][arr]
 
 
@@ -126,7 +130,7 @@ def main():
         if assignment:
             # Display solution.
             # Solution cost.
-            print("Total distance of all routes: " + str(assignment.ObjectiveValue()) + "\n")
+            print("Total distance of all routes: " + str(assignment.ObjectiveValue()) )
 
             result_by_vehicule = []
 
@@ -138,9 +142,13 @@ def main():
                 route_demand = 0
 
                 while not routing.IsEnd(index_next):
+
                     node_index = routing.IndexToNode(index)
                     node_index_next = routing.IndexToNode(index_next)
-                    route += str(node_index) + " -> "
+
+                    if node_index != depot:
+                        route += str(correspondance_case_identreprise[node_index]) + " -> "
+
                     # Add the distance to the next node.
                     route_dist += dist_callback(node_index, node_index_next)
                     # Add demand.
@@ -150,16 +158,17 @@ def main():
 
                 node_index = routing.IndexToNode(index)
                 node_index_next = routing.IndexToNode(index_next)
-                route += str(node_index) + " -> " + str(node_index_next)
+                route += str(correspondance_case_identreprise[node_index])
                 route_dist += dist_callback(node_index, node_index_next)
-                print("Route for vehicle " + str(vehicle_nbr) + ":\n\n" + route + "\n")
-                print("Distance of route " + str(vehicle_nbr) + ": " + str(route_dist))
-                print("Demand met by vehicle " + str(vehicle_nbr) + ": " + str(route_demand) + "\n")
+
+                print("\nVehicle " + str(vehicle_nbr) )
+                print("\tRoute : " + route)
+                print("\tDistance of route : " + str(route_dist))
+                print("\tDemand met : " + str(route_demand) )
 
                 result_by_vehicule.append((vehicle_nbr, route, route_dist, route_demand))
 
-            insert_result(assignment.ObjectiveValue(), num_locations, num_vehicles, result_by_vehicule,
-                          correspondance_case_identreprise)
+            insert_result(assignment.ObjectiveValue(), num_locations, num_vehicles, result_by_vehicule)
 
         else:
             print('No solution found.')
